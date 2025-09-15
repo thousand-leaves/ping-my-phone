@@ -31,7 +31,7 @@
 1. Clone the repo:
 
 ```bash
-git clone https://github.com/yourusername/ping-my-phone.git
+git clone https://github.com/thousand-leaves/ping-my-phone.git
 cd ping-my-phone
 ```
 
