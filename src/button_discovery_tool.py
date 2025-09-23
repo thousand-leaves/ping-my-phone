@@ -27,12 +27,7 @@ from collections import Counter
 
 # Third-party imports for Raspberry Pi GPIO and environment variables
 import RPi.GPIO as GPIO  # Controls GPIO pins on Raspberry Pi
-from dotenv import load_dotenv  # Loads configuration from .env file
 
-# Load environment variables from .env file
-load_dotenv()
-
-# Configuration from environment variables (configured in .env file)
 # These values control how sensitive our RF detection is
 DATA_PIN = int(os.getenv('GPIO_DATA_PIN', '5'))  # Which GPIO pin the RF receiver is connected to
 MIN_PULSES = int(os.getenv('MIN_PULSES', '10'))  # Minimum pulses to consider a valid signal (filters noise)
