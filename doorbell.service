@@ -1,0 +1,14 @@
+[Unit]
+Description=Ping My Phone Doorbell System
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/adam/ping-my-phone
+ExecStart=/home/adam/ping-my-phone/venv/bin/python3 /home/adam/ping-my-phone/doorbell
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
