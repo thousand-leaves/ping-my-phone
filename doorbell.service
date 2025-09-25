@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/home/adam/ping-my-phone
-ExecStart=/home/adam/ping-my-phone/venv/bin/python3 /home/adam/ping-my-phone/doorbell
+ExecStart=/home/adam/ping-my-phone/venv/bin/python3 /home/adam/ping-my-phone/src/doorbell.py
 Restart=always
 RestartSec=5
 

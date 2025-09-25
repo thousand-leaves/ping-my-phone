@@ -1,5 +1,11 @@
 #!/bin/bash
 # Simple script to run the doorbell system with virtual environment
 
-cd /home/adam/ping-my-phone
-sudo /home/adam/ping-my-phone/venv/bin/python3 src/doorbell.py
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Change to the project directory
+cd "$SCRIPT_DIR"
+
+# Run the doorbell system using the virtual environment
+sudo "$SCRIPT_DIR/venv/bin/python3" "$SCRIPT_DIR/src/doorbell.py"
