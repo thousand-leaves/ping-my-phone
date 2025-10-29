@@ -21,6 +21,11 @@ import sys
 import requests
 
 # Third-party imports for RF signal detection and environment variables
+# Prefer system RPi.GPIO (0.7.2) over venv version (0.7.1) for better compatibility
+if '/usr/local/lib/python3.11/dist-packages' not in sys.path:
+    sys.path.insert(0, '/usr/local/lib/python3.11/dist-packages')
+
+import RPi.GPIO as GPIO
 from rpi_rf import RFDevice
 from dotenv import load_dotenv
 
@@ -84,6 +89,8 @@ def send_notification():
 
 try:
     # Initialize RF device
+    # RFDevice handles GPIO setup internally
+    # Note: Uses system RPi.GPIO 0.7.2 (via sys.path modification above) for better compatibility
     rfdevice = RFDevice(GPIO_PIN)
     rfdevice.enable_rx()
     
@@ -118,7 +125,7 @@ except Exception as e:
     print(f"\n❌ Error: {e}")
     import traceback
     traceback.print_exc()  # Print full traceback for debugging
-    if "GPIO busy" in str(e):
-        print("💡 Tip: GPIO is still busy. Try running: sudo python3 cleanup-gpio.py")
+    if "GPIO busy" in str(e) or "edge detection" in str(e):
+        print("💡 Tip: GPIO is still busy or edge detection failed. Try running: sudo python3 cleanup-gpio.py")
     cleanup()
     sys.exit(1)

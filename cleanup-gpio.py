@@ -4,11 +4,16 @@ GPIO Cleanup Script
 Cleans up all GPIO pins and processes
 """
 
-import RPi.GPIO as GPIO
 import subprocess
 import sys
 import os
 import signal
+
+# Prefer system RPi.GPIO (0.7.2) over venv version for better compatibility
+if '/usr/local/lib/python3.11/dist-packages' not in sys.path:
+    sys.path.insert(0, '/usr/local/lib/python3.11/dist-packages')
+
+import RPi.GPIO as GPIO
 
 def cleanup_gpio_pins():
     """Clean up GPIO pins in both BCM and BOARD modes"""

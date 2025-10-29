@@ -64,10 +64,18 @@ sudo venv/bin/python3 src/button_discovery_tool.py
 ```
 Press your RF button several times, then press Ctrl+C. The tool will identify and save your button code.
 
-5. **Run the doorbell system:**
+5. **Test the doorbell system:**
 ```bash
+# First, ensure GPIO is clean
+sudo venv/bin/python3 cleanup-gpio.py
+
+# Then run the doorbell system
 sudo venv/bin/python3 src/doorbell.py
 ```
+
+The doorbell should start and display: `🔔 Doorbell System - Monitoring button code [your_code]`
+
+If you see errors, check the [Troubleshooting](#-troubleshooting) section below.
 
 ---
 
@@ -120,9 +128,39 @@ The service and manual execution cannot run simultaneously due to GPIO pin exclu
 sudo python3 cleanup-gpio.py
 ```
 
+**"Failed to add edge detection" error:**
+If you encounter `RuntimeError: Failed to add edge detection` when running `doorbell.py`:
+
+1. Ensure no other processes are using the GPIO pin:
+   ```bash
+   sudo python3 cleanup-gpio.py
+   sudo systemctl stop doorbell.service  # If service is running
+   ```
+
+2. Verify GPIO pin is available:
+   ```bash
+   gpioinfo | grep GPIO27
+   ```
+   Should show `GPIO27` as `unused`.
+
+3. Check kernel messages for GPIO issues:
+   ```bash
+   sudo dmesg | tail -20 | grep -i gpio
+   ```
+
+4. If the error persists, this may indicate a hardware/library compatibility issue. Try:
+   - Verifying your RF receiver is properly connected
+   - Checking if GPIO pin 27 is correct for your setup
+   - Testing with a different GPIO pin (update `GPIO_DATA_PIN` in `.env`)
+
 **Check if service is running:**
 ```bash
 sudo systemctl status doorbell.service
+```
+
+**View service logs:**
+```bash
+sudo journalctl -u doorbell.service -n 50
 ```
 
 ---
