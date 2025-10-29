@@ -21,10 +21,6 @@ import sys
 import requests
 
 # Third-party imports for RF signal detection and environment variables
-# Prefer system RPi.GPIO (0.7.2) over venv version (0.7.1) for better compatibility
-if '/usr/local/lib/python3.11/dist-packages' not in sys.path:
-    sys.path.insert(0, '/usr/local/lib/python3.11/dist-packages')
-
 import RPi.GPIO as GPIO
 from rpi_rf import RFDevice
 from dotenv import load_dotenv
@@ -90,7 +86,6 @@ def send_notification():
 try:
     # Initialize RF device
     # RFDevice handles GPIO setup internally
-    # Note: Uses system RPi.GPIO 0.7.2 (via sys.path modification above) for better compatibility
     rfdevice = RFDevice(GPIO_PIN)
     rfdevice.enable_rx()
     

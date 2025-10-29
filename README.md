@@ -33,13 +33,16 @@
 git clone https://github.com/thousand-leaves/ping-my-phone.git
 cd ping-my-phone
 
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+# Install system dependencies (using system Python for GPIO access)
+sudo pip3 install --break-system-packages python-dotenv
 ```
 
-**Note:** GPIO access requires sudo, so when running scripts use `sudo venv/bin/python3` to access packages from your venv.
+**Note:** This project uses system Python (`/usr/bin/python3`) because:
+- GPIO access requires root privileges
+- System RPi.GPIO (0.7.2) has better compatibility than venv versions
+- Most dependencies (requests, rpi-rf, RPi.GPIO) are already available system-wide
+
+The `--break-system-packages` flag is needed on modern Python installations that protect system packages. This only installs `python-dotenv` which isn't available via apt.
 
 2. **Configure environment variables:**
 Create a `.env` file in the project root:
@@ -60,17 +63,17 @@ GPIO_DATA_PIN=27
 
 4. **Discover your button code:**
 ```bash
-sudo venv/bin/python3 src/button_discovery_tool.py
+sudo python3 src/button_discovery_tool.py
 ```
 Press your RF button several times, then press Ctrl+C. The tool will identify and save your button code.
 
 5. **Test the doorbell system:**
 ```bash
 # First, ensure GPIO is clean
-sudo venv/bin/python3 cleanup-gpio.py
+sudo python3 cleanup-gpio.py
 
 # Then run the doorbell system
-sudo venv/bin/python3 src/doorbell.py
+sudo python3 src/doorbell.py
 ```
 
 The doorbell should start and display: `🔔 Doorbell System - Monitoring button code [your_code]`
@@ -118,6 +121,8 @@ sudo python3 src/doorbell.py
 ```
 
 The service and manual execution cannot run simultaneously due to GPIO pin exclusivity.
+
+**Note:** All scripts use system Python (`/usr/bin/python3`) for clean GPIO access. No virtual environment needed.
 
 ---
 
