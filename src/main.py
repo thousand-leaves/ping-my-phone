@@ -9,7 +9,7 @@ and sends Telegram notifications when pressed.
 Usage:
 1. Run button discovery tool first: python3 src/button_discovery_tool.py
 2. Set Telegram credentials in .env file
-3. Run this: python3 src/doorbell.py
+3. Run this: python3 src/main.py
 """
 
 # Standard library imports
@@ -64,3 +64,4 @@ except Exception as e:
         print("💡 Tip: GPIO is still busy or edge detection failed. Try running: sudo python3 cleanup-gpio.py")
     service.stop()
     sys.exit(1)
+

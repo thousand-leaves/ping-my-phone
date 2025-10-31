@@ -8,4 +8,4 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # Run the doorbell system using system Python
-sudo python3 "$SCRIPT_DIR/src/doorbell.py"
+sudo python3 "$SCRIPT_DIR/src/main.py"
