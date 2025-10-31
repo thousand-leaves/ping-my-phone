@@ -25,6 +25,9 @@ import RPi.GPIO as GPIO
 from rpi_rf import RFDevice
 from dotenv import load_dotenv
 
+# Local imports
+from telegram_notifier import TelegramNotifier
+
 # Get the directory where this script is located and the project root
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_dir = os.path.dirname(script_dir)
@@ -53,6 +56,9 @@ with open(config_file, 'r') as f:
 print(f"🔔 Doorbell System - Monitoring button code {BUTTON_CODE}")
 print("Press Ctrl+C to exit.")
 
+# Initialize Telegram notifier
+notifier = TelegramNotifier(BOT_TOKEN, CHAT_ID)
+
 # Initialize RF device
 rfdevice = None
 
@@ -70,18 +76,6 @@ def signal_handler(signum, frame):
 
 # Register signal handler so cleanup runs when systemd stops the service
 signal.signal(signal.SIGTERM, signal_handler)
-
-def send_notification():
-    """Send doorbell notification to Telegram."""
-    try:
-        message = f"🔔 DOORBELL PRESSED! 🔔\nTime: {time.strftime('%H:%M:%S')}"
-        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-        response = requests.post(url, data={"chat_id": CHAT_ID, "text": message}, timeout=5)
-        response.raise_for_status()  # Raise exception if HTTP error
-        print(f"✅ Notification sent!")
-    except Exception as e:
-        print(f"⚠️ Warning: Failed to send notification: {e}")
-        # Don't crash - just log the error and continue running
 
 try:
     # Initialize RF device
@@ -107,7 +101,7 @@ try:
                 # Check if enough time has passed since last notification (debouncing)
                 now = time.time()
                 if (now - last_notification_time) >= DEBOUNCE_TIME:
-                    send_notification()
+                    notifier.notify_doorbell()
                     last_notification_time = now
         
         time.sleep(0.01)
