@@ -13,7 +13,6 @@ Usage:
 """
 
 # Standard library imports
-import time
 import signal
 import sys
 
@@ -21,6 +20,7 @@ import sys
 from config import DoorbellConfig
 from telegram_notifier import TelegramNotifier
 from rf_monitor import RFMonitor
+from doorbell_service import DoorbellService
 
 # Load all configuration from .env file and button_config.json
 config = DoorbellConfig()
@@ -28,15 +28,16 @@ config = DoorbellConfig()
 print(f"🔔 Doorbell System - Monitoring button code {config.button_code}")
 print("Press Ctrl+C to exit.")
 
-# Initialize Telegram notifier
+# Initialize components
 notifier = TelegramNotifier(config.bot_token, config.chat_id)
+rf_monitor = RFMonitor(config.gpio_pin)
 
-# Initialize RF monitor
-rfmonitor = RFMonitor(config.gpio_pin)
+# Create doorbell service
+service = DoorbellService(config, notifier, rf_monitor)
 
 def signal_handler(signum, frame):
     """Handle SIGTERM (sent by systemd) - ensures cleanup runs before exit"""
-    rfmonitor.cleanup()
+    service.stop()
     print("Doorbell stopped.")
     sys.exit(0)
 
@@ -44,31 +45,15 @@ def signal_handler(signum, frame):
 signal.signal(signal.SIGTERM, signal_handler)
 
 try:
-    # Start RF monitoring
-    rfmonitor.start()
+    # Start the service (initializes RF monitor)
+    service.start()
     
-    # Debouncing variables to prevent multiple notifications
-    last_notification_time = 0
-    DEBOUNCE_TIME = 2.0  # Minimum seconds between notifications
-    
-    # Main detection loop
-    while True:
-        # Check for newly detected RF code
-        code = rfmonitor.check_for_code()
-        
-        # Only send notification for our configured button code
-        if code == config.button_code:
-            # Check if enough time has passed since last notification (debouncing)
-            now = time.time()
-            if (now - last_notification_time) >= DEBOUNCE_TIME:
-                notifier.notify_doorbell()
-                last_notification_time = now
-        
-        time.sleep(0.01)
+    # Run the main monitoring loop
+    service.run()
 
 except KeyboardInterrupt:
     # Ctrl+C pressed - cleanup GPIO before exiting
-    rfmonitor.cleanup()
+    service.stop()
     print("Doorbell stopped.")
 except Exception as e:
     # Error occurred - cleanup GPIO to prevent pins from getting stuck
@@ -77,5 +62,5 @@ except Exception as e:
     traceback.print_exc()  # Print full traceback for debugging
     if "GPIO busy" in str(e) or "edge detection" in str(e):
         print("💡 Tip: GPIO is still busy or edge detection failed. Try running: sudo python3 cleanup-gpio.py")
-    rfmonitor.cleanup()
+    service.stop()
     sys.exit(1)
