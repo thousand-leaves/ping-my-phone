@@ -73,7 +73,7 @@ Press your RF button several times, then press Ctrl+C. The tool will identify an
 sudo python3 cleanup-gpio.py
 
 # Then run the doorbell system
-sudo python3 src/doorbell.py
+sudo python3 src/main.py
 ```
 
 The doorbell should start and display: `🔔 Doorbell System - Monitoring button code [your_code]`
@@ -117,7 +117,7 @@ sudo journalctl -u doorbell.service -f   # View logs
 
 ```bash
 sudo systemctl stop doorbell.service
-sudo python3 src/doorbell.py
+sudo python3 src/main.py
 ```
 
 The service and manual execution cannot run simultaneously due to GPIO pin exclusivity.
@@ -134,7 +134,7 @@ sudo python3 cleanup-gpio.py
 ```
 
 **"Failed to add edge detection" error:**
-If you encounter `RuntimeError: Failed to add edge detection` when running `doorbell.py`:
+If you encounter `RuntimeError: Failed to add edge detection` when running `main.py`:
 
 1. Ensure no other processes are using the GPIO pin:
    ```bash
